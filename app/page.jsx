@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import { 
   Upload, 
@@ -21,27 +22,30 @@ const Header = () => (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex justify-between items-center py-4">
         <div className="flex items-center space-x-2">
-          <Image
-            src="/images/logo.png"
-            alt="EduScribe Logo"
-            width={32}
-            height={32}
+          <Image 
+            src="/image/logo.png" 
+            alt="EduScribe Logo" 
+            width={32} 
+            height={32} 
             className="rounded-lg"
           />
           <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             EduScribe
           </span>
         </div>
-        <nav className="hidden md:flex space-x-8">
+        <nav className="hidden md:flex space-x-8 ml-auto mr-8">
           <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
           <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 transition-colors">How it Works</a>
-          <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
         </nav>
         <div className="flex items-center space-x-4">
-          <button className="text-gray-600 hover:text-gray-900 transition-colors">Sign In</button>
-          <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:shadow-lg transition-all duration-200">
-            Get Started
-          </button>
+          <Link href="/login">
+            <button className="text-gray-600 hover:text-gray-900 transition-colors">Sign In</button>
+          </Link>
+          <Link href="/register/teacher">
+            <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:shadow-lg transition-all duration-200">
+              Get Started
+            </button>
+          </Link>
         </div>
       </div>
     </div>
@@ -54,12 +58,12 @@ const Hero = () => (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="lg:grid lg:grid-cols-2 lg:gap-8 items-center">
         <div className="mb-16 lg:mb-0">
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
               <Zap className="w-4 h-4 mr-1" />
               AI-Powered Education
             </span>
-          </div>
+          </div> */}
           <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
             Transform
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Lectures </span>
@@ -70,14 +74,16 @@ const Hero = () => (
             your recorded classes into multiple languages including Nigerian local languages.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 mb-8">
-            <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:shadow-xl transition-all duration-200 flex items-center justify-center">
-              Start Free Trial
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </button>
-            <button className="border-2 border-gray-200 text-gray-700 px-8 py-4 rounded-lg text-lg font-semibold hover:border-gray-300 hover:shadow-md transition-all duration-200 flex items-center justify-center">
+            <Link href="/register/teacher">
+              <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:shadow-xl transition-all duration-200 flex items-center justify-center w-full">
+                Get Started
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </button>
+            </Link>
+            {/* <button className="border-2 border-gray-200 text-gray-700 px-8 py-4 rounded-lg text-lg font-semibold hover:border-gray-300 hover:shadow-md transition-all duration-200 flex items-center justify-center">
               <Play className="mr-2 h-5 w-5" />
               Watch Demo
-            </button>
+            </button> */}
           </div>
           <div className="flex items-center space-x-6 text-sm text-gray-600">
             <div className="flex items-center">
@@ -87,11 +93,11 @@ const Hero = () => (
             </div>
             <div className="flex items-center">
               <Users className="h-5 w-5 text-gray-400 mr-1" />
-              <span>10,000+ teachers</span>
+              <span>100+ teachers</span>
             </div>
             <div className="flex items-center">
               <Globe className="h-5 w-5 text-gray-400 mr-1" />
-              <span>50+ languages</span>
+              <span>3 languages</span>
             </div>
           </div>
         </div>
@@ -272,14 +278,16 @@ const CTA = () => (
         with EduScribe's AI-powered transcription and translation.
       </p>
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
-        <button className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:shadow-xl transition-all duration-200">
-          Start Free Trial
-        </button>
-        <button className="border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-blue-600 transition-all duration-200">
+        <Link href="/register/teacher">
+          <button className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:shadow-xl transition-all duration-200">
+            Get Started
+          </button>
+        </Link>
+        {/* <button className="border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-blue-600 transition-all duration-200">
           Schedule Demo
-        </button>
+        </button> */}
       </div>
-      <p className="text-blue-200 text-sm mt-6">No credit card required • 14-day free trial • Cancel anytime</p>
+      {/* <p className="text-blue-200 text-sm mt-6">No credit card required • 14-day free trial • Cancel anytime</p> */}
     </div>
   </section>
 );

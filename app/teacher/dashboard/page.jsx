@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../components/AuthContext';
+import ProtectedRoute from '../../components/ProtectedRoute';
 import { 
   Upload, 
   FileText, 
@@ -87,7 +88,7 @@ const SessionCard = ({ session, onView, onDelete }) => (
   </div>
 );
 
-export default function TeacherDashboard() {
+function TeacherDashboard() {
   const { user, logout, apiCall } = useAuth();
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -339,5 +340,13 @@ export default function TeacherDashboard() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ProtectedTeacherDashboard() {
+  return (
+    <ProtectedRoute requiredRole="teacher">
+      <TeacherDashboard />
+    </ProtectedRoute>
   );
 }

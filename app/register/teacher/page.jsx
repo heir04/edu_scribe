@@ -1,21 +1,29 @@
-'use client';
-import { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../../components/AuthContext';
-import { Eye, EyeOff, BookOpen, AlertCircle, CheckCircle, GraduationCap } from 'lucide-react';
+"use client";
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../components/AuthContext";
+import {
+  Eye,
+  EyeOff,
+  BookOpen,
+  AlertCircle,
+  CheckCircle,
+  GraduationCap,
+} from "lucide-react";
 
 export default function TeacherRegisterPage() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   const { registerTeacher } = useAuth();
@@ -27,25 +35,25 @@ export default function TeacherRegisterPage() {
       [e.target.name]: e.target.value,
     });
     // Clear messages when user starts typing
-    if (error) setError('');
-    if (success) setSuccess('');
+    if (error) setError("");
+    if (success) setSuccess("");
   };
 
   const validateForm = () => {
     if (!formData.name.trim()) {
-      setError('Name is required');
+      setError("Name is required");
       return false;
     }
     if (!formData.email.trim()) {
-      setError('Email is required');
+      setError("Email is required");
       return false;
     }
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError("Password must be at least 6 characters");
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return false;
     }
     return true;
@@ -53,24 +61,28 @@ export default function TeacherRegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!validateForm()) return;
-    
-    setLoading(true);
-    setError('');
-    setSuccess('');
 
-    const result = await registerTeacher(formData.name, formData.email, formData.password);
-    
+    if (!validateForm()) return;
+
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    const result = await registerTeacher(
+      formData.name,
+      formData.email,
+      formData.password
+    );
+
     if (result.success) {
       setSuccess(result.message);
       setTimeout(() => {
-        router.push('/login');
+        router.push("/login");
       }, 2000);
     } else {
       setError(result.message);
     }
-    
+
     setLoading(false);
   };
 
@@ -80,16 +92,22 @@ export default function TeacherRegisterPage() {
         {/* Header */}
         <div className="text-center">
           <div className="flex items-center justify-center space-x-2 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-              <BookOpen className="h-7 w-7 text-white" />
-            </div>
+            <Image 
+              src="/image/logo.png" 
+              alt="EduScribe Logo" 
+              width={48} 
+              height={48} 
+              className="rounded-xl"
+            />
             <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               EduScribe
             </span>
           </div>
           <div className="flex items-center justify-center space-x-2 mb-4">
             <GraduationCap className="h-6 w-6 text-blue-600" />
-            <h2 className="text-3xl font-bold text-gray-900">Join as a Teacher</h2>
+            <h2 className="text-3xl font-bold text-gray-900">
+              Join as a Teacher
+            </h2>
           </div>
           <p className="mt-2 text-sm text-gray-600">
             Create your teacher account and start transforming education
@@ -114,7 +132,10 @@ export default function TeacherRegisterPage() {
             )}
 
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Full Name
               </label>
               <input
@@ -131,7 +152,10 @@ export default function TeacherRegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Email Address
               </label>
               <input
@@ -148,14 +172,17 @@ export default function TeacherRegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Password
               </label>
               <div className="relative">
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
                   required
                   value={formData.password}
@@ -178,14 +205,17 @@ export default function TeacherRegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Confirm Password
               </label>
               <div className="relative">
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
+                  type={showConfirmPassword ? "text" : "password"}
                   autoComplete="new-password"
                   required
                   value={formData.confirmPassword}
@@ -215,13 +245,22 @@ export default function TeacherRegisterPage() {
                 required
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
-                I agree to the{' '}
-                <a href="#" className="text-blue-600 hover:text-blue-500 font-medium">
+              <label
+                htmlFor="terms"
+                className="ml-2 block text-sm text-gray-900"
+              >
+                I agree to the{" "}
+                <a
+                  href="#"
+                  className="text-blue-600 hover:text-blue-500 font-medium"
+                >
                   Terms of Service
-                </a>{' '}
-                and{' '}
-                <a href="#" className="text-blue-600 hover:text-blue-500 font-medium">
+                </a>{" "}
+                and{" "}
+                <a
+                  href="#"
+                  className="text-blue-600 hover:text-blue-500 font-medium"
+                >
                   Privacy Policy
                 </a>
               </label>
@@ -238,7 +277,7 @@ export default function TeacherRegisterPage() {
                   Creating Account...
                 </div>
               ) : (
-                'Create Teacher Account'
+                "Create Teacher Account"
               )}
             </button>
           </form>
@@ -249,7 +288,9 @@ export default function TeacherRegisterPage() {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Already have an account?</span>
+                <span className="px-2 bg-white text-gray-500">
+                  Already have an account?
+                </span>
               </div>
             </div>
 
@@ -263,8 +304,17 @@ export default function TeacherRegisterPage() {
           </div>
         </div>
 
-        <div className="text-center">
-          <Link href="/" className="text-sm text-gray-600 hover:text-gray-900">
+        <div className="text-center space-y-2">
+          <Link
+            href="/register/student"
+            className="text-sm text-blue-600 hover:text-blue-700 block"
+          >
+            Are you a student? Register here
+          </Link>
+          <Link
+            href="/"
+            className="text-sm text-gray-600 hover:text-gray-900 block"
+          >
             ← Back to home
           </Link>
         </div>

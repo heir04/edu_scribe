@@ -1,5 +1,5 @@
 'use client';
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 const AuthContext = createContext();
@@ -14,13 +14,30 @@ export const useAuth = () => {
 
 // Decode JWT token to extract user info
 const decodeToken = (token) => {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return {
+        id: payload.jti || payload.sub,
+        email: payload.sub,
+        role: payload.role || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
+        exp: payload.exp
+      };
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return null;
+    }
+  };
+
+// Check if token is expired
+const isTokenExpired = (token) => {
+  if (!token) return true;
   try {
-    const payload = token.split('.')[1];
-    const decoded = JSON.parse(atob(payload));
-    return decoded;
+    const decoded = decodeToken(token);
+    if (!decoded) return true;
+    const currentTime = Date.now() / 1000;
+    return decoded.exp < currentTime;
   } catch (error) {
-    console.error('Error decoding token:', error);
-    return null;
+    return true;
   }
 };
 
@@ -28,26 +45,81 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
   const router = useRouter();
 
   // Base API URL
-  const API_BASE_URL = 'https://api.eduscribe.com/api';
+  const API_BASE_URL = 'http://localhost:5260/api';
 
-  // Initialize auth state from localStorage
-  useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    if (storedToken) {
-      const userData = decodeToken(storedToken);
-      if (userData && userData.exp * 1000 > Date.now()) {
-        setToken(storedToken);
-        setUser(userData);
-      } else {
-        // Token expired
-        localStorage.removeItem('token');
-      }
+  // Logout function - wrapped in useCallback to prevent infinite loops
+  const logout = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
     }
+    setUser(null);
+    setToken(null);
+    router.push('/login');
+  }, [router]);
+
+  // Check and refresh token
+  const checkTokenValidity = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    
+    const storedToken = localStorage.getItem('token');
+    if (!storedToken) {
+      setUser(null);
+      setToken(null);
+      return;
+    }
+
+    if (isTokenExpired(storedToken)) {
+      console.log('Token expired, logging out');
+      logout();
+      return;
+    }
+
+    const userData = decodeToken(storedToken);
+    if (userData) {
+      setToken(storedToken);
+      setUser(userData);
+    } else {
+      logout();
+    }
+  }, [logout]);
+
+  // Initialize auth state
+  useEffect(() => {
+    checkTokenValidity();
     setLoading(false);
-  }, []);
+    setIsInitialized(true);
+  }, [checkTokenValidity]);
+
+  // Check token validity periodically and on focus
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    const interval = setInterval(checkTokenValidity, 60000); // Check every minute
+
+    const handleFocus = () => checkTokenValidity();
+    const handleStorage = (e) => {
+      if (e.key === 'token') {
+        checkTokenValidity();
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', handleFocus);
+      window.addEventListener('storage', handleStorage);
+    }
+
+    return () => {
+      clearInterval(interval);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('focus', handleFocus);
+        window.removeEventListener('storage', handleStorage);
+      }
+    };
+  }, [isInitialized, checkTokenValidity]);
 
   const login = async (email, password) => {
     try {
@@ -64,18 +136,27 @@ export const AuthProvider = ({ children }) => {
       if (response.ok && data.token) {
         const userData = decodeToken(data.token);
         
-        setToken(data.token);
-        setUser(userData);
-        localStorage.setItem('token', data.token);
-        
-        // Redirect based on user role
-        if (userData.role === '0') { // Teacher
-          router.push('/teacher/dashboard');
-        } else { // Student
-          router.push('/student/dashboard');
+        if (userData && !isTokenExpired(data.token)) {
+          setToken(data.token);
+          setUser(userData);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('token', data.token);
+          }
+          
+          // Redirect based on user role
+          if (userData.role.toLowerCase() === 'teacher') {
+            router.push('/teacher/dashboard');
+          } else {
+            router.push('/student/dashboard');
+          }
+          
+          return { success: true };
+        } else {
+          return { 
+            success: false, 
+            message: 'Invalid or expired token received' 
+          };
         }
-        
-        return { success: true };
       } else {
         return { 
           success: false, 
@@ -83,6 +164,7 @@ export const AuthProvider = ({ children }) => {
         };
       }
     } catch (error) {
+      console.error('Login error:', error);
       return { 
         success: false, 
         message: 'Network error. Please try again.' 
@@ -146,15 +228,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('token');
-    router.push('/');
-  };
-
   // API helper function with automatic token inclusion
   const apiCall = async (endpoint, options = {}) => {
+    // Check token validity before making API call
+    if (token && isTokenExpired(token)) {
+      logout();
+      return null;
+    }
+
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -169,6 +250,7 @@ export const AuthProvider = ({ children }) => {
       
       if (response.status === 401) {
         // Token expired or invalid
+        console.log('API call returned 401, logging out');
         logout();
         return null;
       }
@@ -190,9 +272,9 @@ export const AuthProvider = ({ children }) => {
     registerTeacher,
     registerStudent,
     apiCall,
-    isTeacher: user?.role === '0',
-    isStudent: user?.role === '1',
-    isAuthenticated: !!user && !!token,
+    isTeacher: user?.role.toLowerCase() === 'teacher',
+    isStudent: user?.role === '1' || user?.role.toLowerCase() === 'student',
+    isAuthenticated: !!user && !!token && !isTokenExpired(token),
   };
 
   return (
