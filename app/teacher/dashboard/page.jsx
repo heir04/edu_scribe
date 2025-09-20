@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../components/AuthContext';
 import ProtectedRoute from '../../components/ProtectedRoute';
+import Image from 'next/image';
 import { 
   Upload, 
   FileText, 
@@ -187,9 +188,13 @@ function TeacherDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <BookOpen className="h-5 w-5 text-white" />
-              </div>
+              <Image 
+                src="/image/logo.png" 
+                alt="EduScribe Logo" 
+                width={32} 
+                height={32} 
+                className="rounded-lg"
+              />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Teacher Dashboard</h1>
                 <p className="text-sm text-gray-600">Welcome back, {user?.name || 'Teacher'}</p>
