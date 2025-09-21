@@ -91,15 +91,35 @@ async function handleRequest(request, method, params) {
     let data;
     const responseContentType = response.headers.get('content-type');
     
-    if (responseContentType?.includes('application/json')) {
-      data = await response.json();
-    } else {
-      // If response is not JSON, wrap it in a standard format
+    try {
+      if (responseContentType?.includes('application/json')) {
+        data = await response.json();
+      } else {
+        // If response is not JSON, get the text content
+        const text = await response.text();
+        
+        // Try to parse as JSON first (in case content-type header is wrong)
+        try {
+          data = JSON.parse(text);
+        } catch (parseError) {
+          // If not JSON, wrap the text response in a standard format
+          data = {
+            status: response.ok,
+            message: response.ok ? 'Success' : `Server error: ${response.status} - ${text.substring(0, 200)}...`,
+            data: text,
+            responseContentType,
+            httpStatus: response.status
+          };
+        }
+      }
+    } catch (jsonError) {
+      // Fallback if any JSON parsing fails
       const text = await response.text();
       data = {
-        status: response.ok,
-        message: response.ok ? 'Success' : `Error: ${response.status}`,
-        data: text
+        status: false,
+        message: `Response parsing error: ${jsonError.message}. Response: ${text.substring(0, 200)}...`,
+        data: text,
+        error: 'JSON_PARSE_ERROR'
       };
     }
 
