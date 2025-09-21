@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
   // Base API URL
-  const API_BASE_URL = 'http://localhost:5260/api';
+  const API_BASE_URL = 'http://eduscribe.runasp.net/api';
 
   // Logout function - wrapped in useCallback to prevent infinite loops
   const logout = useCallback(() => {
