@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '../../../components/AuthContext';
 import ProtectedRoute from '../../../components/ProtectedRoute';
+import Image from 'next/image';
 import { 
   ArrowLeft, 
   FileText, 
@@ -257,9 +258,13 @@ function SessionDetailPage() {
                 <ArrowLeft className="h-5 w-5 mr-1" />
                 Back
               </button>
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <BookOpen className="h-5 w-5 text-white" />
-              </div>
+              <Image 
+                src="/image/logo.png" 
+                alt="EduScribe Logo" 
+                width={32} 
+                height={32}
+                className="object-contain"
+              />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">{session.name}</h1>
                 <div className="flex items-center space-x-4 text-sm text-gray-600">

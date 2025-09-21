@@ -3,6 +3,7 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../components/AuthContext';
 import ProtectedRoute from '../../components/ProtectedRoute';
+import Image from 'next/image';
 import { 
   Upload, 
   FileAudio, 
@@ -181,9 +182,13 @@ function TeacherUploadPage() {
               <ArrowLeft className="h-5 w-5 mr-1" />
               Back
             </button>
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center mr-3">
-              <BookOpen className="h-5 w-5 text-white" />
-            </div>
+            <Image 
+              src="/image/logo.png" 
+              alt="EduScribe Logo" 
+              width={32} 
+              height={32}
+              className="object-contain mr-3"
+            />
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Upload New Session</h1>
               <p className="text-sm text-gray-600">Upload your class recording for AI transcription</p>

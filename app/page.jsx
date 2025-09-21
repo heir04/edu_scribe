@@ -39,7 +39,7 @@ const Header = () => (
         </nav>
         <div className="flex items-center space-x-4">
           <Link href="/login">
-            <button className="text-gray-600 hover:text-gray-900 transition-colors">Sign In</button>
+            <button className="hidden sm:block text-gray-600 hover:text-gray-900 transition-colors">Sign In</button>
           </Link>
           <Link href="/register/teacher">
             <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:shadow-lg transition-all duration-200">
@@ -299,9 +299,13 @@ const Footer = () => (
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="md:col-span-1">
           <div className="flex items-center space-x-2 mb-4">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <BookOpen className="h-5 w-5 text-white" />
-            </div>
+            <Image 
+              src="/image/logo.png" 
+              alt="EduScribe Logo" 
+              width={32} 
+              height={32}
+              className="object-contain"
+            />
             <span className="text-2xl font-bold text-white">EduScribe</span>
           </div>
           <p className="text-gray-400">
