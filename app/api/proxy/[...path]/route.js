@@ -18,6 +18,17 @@ export async function DELETE(request, { params }) {
   return handleRequest(request, 'DELETE', params);
 }
 
+export async function OPTIONS(request, { params }) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
+
 async function handleRequest(request, method, params) {
   try {
     const { searchParams } = new URL(request.url);
@@ -25,6 +36,7 @@ async function handleRequest(request, method, params) {
     
     // Get authorization header from the request
     const authHeader = request.headers.get('authorization');
+    const contentType = request.headers.get('content-type');
     
     // Prepare headers for backend request
     const headers = {
@@ -51,20 +63,45 @@ async function handleRequest(request, method, params) {
     if (method === 'POST' || method === 'PUT') {
       const contentType = request.headers.get('content-type');
       
+      // Check if it's JSON data
       if (contentType?.includes('application/json')) {
         config.body = JSON.stringify(await request.json());
-      } else if (contentType?.includes('multipart/form-data')) {
+      } 
+      // Check if it's multipart/form-data OR if no content-type is set (likely FormData)
+      else if (contentType?.includes('multipart/form-data') || !contentType) {
         // For file uploads, don't set Content-Type header, let fetch handle it
         delete headers['Content-Type'];
-        config.body = await request.formData();
-      } else {
+        try {
+          const formData = await request.formData();
+          config.body = formData;
+        } catch (error) {
+          // If FormData parsing fails, try as text
+          config.body = await request.text();
+        }
+      } 
+      else {
         config.body = await request.text();
       }
     }
 
     // Make request to backend
     const response = await fetch(backendUrl, config);
-    const data = await response.json();
+    
+    // Handle different response types
+    let data;
+    const responseContentType = response.headers.get('content-type');
+    
+    if (responseContentType?.includes('application/json')) {
+      data = await response.json();
+    } else {
+      // If response is not JSON, wrap it in a standard format
+      const text = await response.text();
+      data = {
+        status: response.ok,
+        message: response.ok ? 'Success' : `Error: ${response.status}`,
+        data: text
+      };
+    }
 
     return NextResponse.json(data, { 
       status: response.status,
