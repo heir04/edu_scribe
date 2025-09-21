@@ -236,9 +236,13 @@ export const AuthProvider = ({ children }) => {
       return null;
     }
 
+    // Check if body is FormData to avoid setting Content-Type header
+    const isFormData = options.body instanceof FormData;
+    
     const config = {
       headers: {
-        'Content-Type': 'application/json',
+        // Only set Content-Type if it's not FormData
+        ...(!isFormData && { 'Content-Type': 'application/json' }),
         ...(token && { Authorization: `Bearer ${token}` }),
         ...options.headers,
       },

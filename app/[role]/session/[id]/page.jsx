@@ -140,7 +140,7 @@ function SessionDetailPage() {
         // Add the new translation to the list (without content initially)
         const newTranslation = {
           id: result.data.data.id,
-          targetLanguage: result.data.data.targetLanguage,
+          targetLanguage: result.data.data.language,
           sessionId: params.id
         };
         setTranslations([...translations, newTranslation]);
@@ -550,7 +550,7 @@ function SessionDetailPage() {
                       >
                         <option value="">Select language</option>
                         {availableLanguages.map(lang => (
-                          <option key={lang} value={lang}>{lang}</option>
+                          <option key={lang.code} value={lang.code}>{lang.name}</option>
                         ))}
                       </select>
                       <button

@@ -146,9 +146,6 @@ function TeacherUploadPage() {
 
       const result = await apiCall('/Session/Create', {
         method: 'POST',
-        headers: {
-          // Don't set Content-Type for FormData, let the browser set it
-        },
         body: formDataToSend
       });
 
