@@ -250,7 +250,16 @@ export const AuthProvider = ({ children }) => {
     };
 
     try {
-      const response = await fetch(`${API_BASE_URL}/proxy${endpoint}`, config);
+      // Add timeout for mobile connections
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutes timeout for uploads
+
+      const response = await fetch(`${API_BASE_URL}/proxy${endpoint}`, {
+        ...config,
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
       
       if (response.status === 401) {
         // Token expired or invalid
@@ -263,7 +272,22 @@ export const AuthProvider = ({ children }) => {
       return { response, data };
     } catch (error) {
       console.error('API call error:', error);
-      return null;
+      if (error.name === 'AbortError') {
+        return { 
+          response: null, 
+          data: { 
+            status: false, 
+            message: 'Request timeout. Please check your connection and try again.' 
+          } 
+        };
+      }
+      return { 
+        response: null, 
+        data: { 
+          status: false, 
+          message: error.message || 'Network error occurred' 
+        } 
+      };
     }
   };
 

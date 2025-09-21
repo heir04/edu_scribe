@@ -115,7 +115,11 @@ async function handleRequest(request, method, params) {
   } catch (error) {
     console.error('Proxy error:', error);
     return NextResponse.json(
-      { success: false, message: 'Server error' },
+      { 
+        status: false, 
+        message: `Server error: ${error.message}`,
+        data: null 
+      },
       { status: 500 }
     );
   }

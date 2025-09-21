@@ -30,6 +30,7 @@ function TeacherUploadPage() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [debugInfo, setDebugInfo] = useState(''); // For mobile debugging
 
   const supportedLanguages = [
     { value: 'en', label: 'English' }
@@ -57,10 +58,22 @@ function TeacherUploadPage() {
         return;
       }
 
-      // Check file type
+      // Enhanced file type checking for mobile
       const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
-      if (!supportedFormats.includes(fileExtension)) {
+      const mimeType = file.type.toLowerCase();
+      
+      // Check both extension and MIME type for better mobile compatibility
+      const isValidExtension = supportedFormats.includes(fileExtension);
+      const isValidMimeType = mimeType.startsWith('audio/') || mimeType.startsWith('video/');
+      
+      if (!isValidExtension && !isValidMimeType) {
         setError('Unsupported file format. Please upload an audio or video file.');
+        return;
+      }
+
+      // Additional mobile-specific checks
+      if (file.size === 0) {
+        setError('Selected file appears to be empty. Please try selecting again.');
         return;
       }
 
@@ -134,6 +147,12 @@ function TeacherUploadPage() {
       formDataToSend.append('language', formData.language);
       formDataToSend.append('file', selectedFile);
 
+      // Add mobile-specific debugging
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const debugMsg = `Mobile: ${isMobile}, File: ${selectedFile.name}, Size: ${selectedFile.size}, Type: ${selectedFile.type}`;
+      setDebugInfo(debugMsg);
+      console.log('Upload attempt -', debugMsg);
+
       // Simulate upload progress
       const progressInterval = setInterval(() => {
         setUploadProgress(prev => {
@@ -153,17 +172,28 @@ function TeacherUploadPage() {
       clearInterval(progressInterval);
       setUploadProgress(100);
 
-      if (result && result.data.status) {
+      console.log('Upload result:', result);
+
+      if (result && result.data && result.data.status) {
         setSuccess('Session uploaded successfully! Processing transcript...');
+        setDebugInfo(''); // Clear debug info on success
         setTimeout(() => {
           router.push('/teacher/dashboard');
         }, 2000);
       } else {
-        setError(result?.data?.message || 'Upload failed. Please try again.');
+        const errorMsg = result?.data?.message || result?.message || 'Upload failed. Please try again.';
+        const statusCode = result?.response?.status || 'unknown';
+        const fullError = `Upload failed (${statusCode}): ${errorMsg}`;
+        const detailedDebug = `Error: ${fullError} | Debug: ${debugInfo} | Full Result: ${JSON.stringify(result)}`;
+        console.error('Upload failed with error:', fullError, 'Full result:', result);
+        setError(fullError);
+        setDebugInfo(detailedDebug); // Show detailed debug info
       }
     } catch (error) {
       console.error('Upload error:', error);
-      setError('Upload failed. Please check your connection and try again.');
+      const errorDetails = `Upload failed: ${error.message || 'Please check your connection and try again.'} | Debug: ${debugInfo}`;
+      setError(errorDetails);
+      setDebugInfo(`Catch Error: ${error.message} | Stack: ${error.stack}`);
     } finally {
       setUploading(false);
     }
@@ -231,6 +261,20 @@ function TeacherUploadPage() {
           <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center space-x-2 mb-8">
             <AlertCircle className="h-5 w-5 text-red-500" />
             <span className="text-sm text-red-700">{error}</span>
+          </div>
+        )}
+
+        {/* Debug Info for Mobile (only show if there's debug info and error) */}
+        {debugInfo && error && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-8">
+            <details>
+              <summary className="text-sm font-medium text-yellow-800 cursor-pointer">
+                Debug Information (Tap to expand)
+              </summary>
+              <div className="mt-2 text-xs text-yellow-700 font-mono break-all">
+                {debugInfo}
+              </div>
+            </details>
           </div>
         )}
 
@@ -327,7 +371,7 @@ function TeacherUploadPage() {
             <input
               ref={fileInputRef}
               type="file"
-              accept="audio/*,video/*"
+              accept="audio/*,video/*,.mp3,.wav,.m4a,.aac,.ogg,.flac,.mp4,.mov,.avi,.mkv,.webm"
               onChange={handleFileSelect}
               className="hidden"
             />
