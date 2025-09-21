@@ -102,24 +102,20 @@ async function handleRequest(request, method, params) {
         try {
           data = JSON.parse(text);
         } catch (parseError) {
-          // If not JSON, wrap the text response in a standard format
+          // If not JSON, return user-friendly error message
           data = {
-            status: response.ok,
-            message: response.ok ? 'Success' : `Server error: ${response.status} - ${text.substring(0, 200)}...`,
-            data: text,
-            responseContentType,
-            httpStatus: response.status
+            status: false,
+            message: "Upload failed. Please try again later.",
+            data: null
           };
         }
       }
     } catch (jsonError) {
-      // Fallback if any JSON parsing fails
-      const text = await response.text();
+      // Fallback for any JSON parsing errors - return user-friendly message
       data = {
         status: false,
-        message: `Response parsing error: ${jsonError.message}. Response: ${text.substring(0, 200)}...`,
-        data: text,
-        error: 'JSON_PARSE_ERROR'
+        message: "Upload failed. Please try again later.",
+        data: null
       };
     }
 
