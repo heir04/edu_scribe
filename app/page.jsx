@@ -317,8 +317,6 @@ const Footer = () => (
           <h4 className="text-white font-semibold mb-4">Product</h4>
           <ul className="space-y-2">
             <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-            <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
-            <li><a href="#" className="hover:text-white transition-colors">API</a></li>
           </ul>
         </div>
         
@@ -327,7 +325,6 @@ const Footer = () => (
           <ul className="space-y-2">
             <li><a href="#" className="hover:text-white transition-colors">About</a></li>
             <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
-            <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
           </ul>
         </div>
         
@@ -342,7 +339,7 @@ const Footer = () => (
       </div>
       
       <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-        <p>&copy; 2024 EduScribe. All rights reserved.</p>
+        <p>&copy; 2025 EduScribe. All rights reserved.</p>
       </div>
     </div>
   </footer>
