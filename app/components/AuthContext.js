@@ -48,8 +48,8 @@ export const AuthProvider = ({ children }) => {
   const [isInitialized, setIsInitialized] = useState(false);
   const router = useRouter();
 
-  // Base API URL
-  const API_BASE_URL = 'http://eduscribe.runasp.net/api';
+  // Use proxy endpoints instead of direct HTTP calls to avoid mixed content errors
+  const API_BASE_URL = '/api';
 
   // Logout function - wrapped in useCallback to prevent infinite loops
   const logout = useCallback(() => {
@@ -123,7 +123,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/User/Login`, {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -174,7 +174,7 @@ export const AuthProvider = ({ children }) => {
 
   const registerTeacher = async (name, email, password) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/User/RegisterTeacher`, {
+      const response = await fetch(`${API_BASE_URL}/auth/register-teacher`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -202,7 +202,7 @@ export const AuthProvider = ({ children }) => {
 
   const registerStudent = async (name, email, password) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/User/RegisterStudent`, {
+      const response = await fetch(`${API_BASE_URL}/auth/register-student`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -250,7 +250,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+      const response = await fetch(`${API_BASE_URL}/proxy${endpoint}`, config);
       
       if (response.status === 401) {
         // Token expired or invalid
